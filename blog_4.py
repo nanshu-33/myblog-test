@@ -164,7 +164,7 @@ def create_comment( content, user_id,username,is_admin,parent_id):
 # ========== 路由 ==========
 
 @app.route('/')
-@login_required
+
 def index():
     posts = get_all_posts()  #调用了取出全部文章的函数
     authors = [a[0] for a in db.session.query(User.username).distinct().all()]
