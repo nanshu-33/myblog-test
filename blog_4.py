@@ -102,6 +102,8 @@ def get_category_user(author_name):
 
 def get_all_posts():
     """获取所有文章，按时间倒序"""
+    if not current_user or not current_user.is_authenticated:
+        return []
     conn = get_db()  #打开数据库连接
     if current_user.is_admin:
        
