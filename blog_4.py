@@ -165,11 +165,11 @@ def create_comment( content, user_id,username,is_admin,parent_id):
 
 # ========== 路由 ==========
 
+
 @app.route('/')
 @login_required
 def index():
-    posts = get_all_posts()
-    return f"获取到 {len(posts)} 篇文章"
+    return render_template('content.html', posts=[], authors=[])
 
 @app.route('/article')
 @login_required
