@@ -48,7 +48,7 @@ class Post(db.Model,UserMixin):
     content = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(50), default='未分类')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    summary = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.Column(db.String(80))
 
