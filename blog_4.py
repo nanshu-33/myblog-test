@@ -165,7 +165,7 @@ def create_comment( content, user_id,username,is_admin,parent_id):
 
 @app.route('/')
 @login_required
-@app.route('/')
+
 def index():
     return "Hello, 首页正常！"
 
