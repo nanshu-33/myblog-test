@@ -33,7 +33,7 @@ def get_db():
     return conn  #这里conn是局部变量，我们要把局部变量的修改结果传递出去
 #第一个函数规定好了conn里的标准访问操作，后续操作数据库的时候都要先调用第一个函数把操作规范，然后再进行后面的内容
 
-BASE_DIR = r'D:\my_blog'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, 'blog.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
