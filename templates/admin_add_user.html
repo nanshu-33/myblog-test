@@ -1,0 +1,62 @@
+<!--基础模版框架，定义好了页头和页脚，中间部分替换就行-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}添加账号{% endblock %}</title>  
+    <!--这里花括号的内容是:定义一个名叫 title 的“占位区”，默认显示“我的博客”，但子模板可以随时替换掉它。
+    名字自己起，使用子模板的时候保持相同即可-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='basic111.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>后台管理</h1>
+        <nav>
+            <a href="/logout">退登</a> 
+        </nav>
+    </header>
+
+    <main>
+        <div class="new-post-form">
+    <h2>添加账号</h2>
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+        <form method="POST" action="{{ url_for('admin_add_user') }}"> 
+            <div class="push">
+                <div class="form-group">
+                    <label for="username">用户名</label>  
+                    <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">密码验证</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="请再次输入密码" required>
+                </div>
+                <div class="form-group-1">
+                    <label for="is_admin">设置为管理员</label>
+                    <input type="checkbox" id="is_admin" name="is_admin">
+                </div>
+            </div>
+            <div class="form-actions">
+                <a href="/admin" class="btn btn-back">← 返回首页</a>
+                <button type="submit" class="btn btn-submit">存入用户</button> 
+            </div>
+        </form>
+        
+       
+</div>
+    </main>
+
+    <footer>
+        <p>© 2026 我的博客</p>
+    </footer>
+</body>
+</html>

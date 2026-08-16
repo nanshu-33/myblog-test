@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}注册{% endblock %}</title>  
+    <link rel="stylesheet" href="{{ url_for('static', filename='basic111.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="auth-form">
+    <h2>注册</h2>
+    {% if error %}
+        <div style="color: red;">{{ error }}</div>
+    {% endif %}
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" placeholder="请输入密码" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">确认密码</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="请再次输入密码" required>
+        </div>
+        <div class="form-actions">
+        <button type="submit" class="btn">注册</button>
+        </div>
+    </form>
+    <p>已有账号？<a href="/login">去登录</a></p>
+</div>
+    {% if show_alert %}
+    <!--<script> 标签是 HTML 中用来嵌入或引用 JavaScript 代码的标签-->
+    <script>  
+        alert('注册成功！请登录');  
+        window.location.href = "{{ url_for('login') }}";
+    </script>
+    <!--alert浏览器弹窗，window.location.href = ...	JavaScript 跳转，相当于在地址栏输入网址-->
+    {% endif %}
+</body>
+</html>
+

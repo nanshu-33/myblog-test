@@ -1,0 +1,29 @@
+{% extends "base.html" %}      <!--继承父模板-->
+
+{% block title %}文章详情{% endblock %} <!--修改这个标题的内容-->
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='post.css') }}">
+{% endblock %}
+
+{% block content %}   <!--填充不同的正文部分-->
+    
+            <article>
+                <h2>{{ post.title }}</h2>
+                <div class="post-meta">
+                    <span class="category-tag">{{ post.category }}</span>
+                    <span>{{ post.created_at }}</span>
+                    <span>{{post.author}}</span>
+                </div>
+                <div class="content">
+                <p>{{ post.content }}</p>
+                </div>
+                <div class="post-actions">
+                <a href="javascript:history.back()" class="btn btn-home">← 返回</a>
+                <a href="/post/{{ post.id }}/edit" class="btn btn-edit">编辑文章</a>
+                <a href="/category/{{ post.category }}" class="btn btn-category">更多 {{ post.category }} 文章</a>
+                <form action="/post/{{ post.id }}/delete" method="POST">
+                <button type="submit" class="btn btn-delete" onclick="return confirm('确定要删除这篇文章吗？');">删除文章</button>
+                </form>
+                </div>
+            </article>
+{% endblock %}

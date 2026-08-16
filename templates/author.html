@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{category_name}}{% endblock %}
+{% block content %}
+<div class="posts-wrapper">
+    <div class="push">
+    {% if posts %}
+            {% for post in posts %}  
+                <article>
+                    <h2>{{ post.title }}</h2>
+                    <p>发布时间：{{ post.created_at }}</p>
+                    <p>文章类别：{{post.category}}</p>
+                    <p class="article-summary">文章简介：{{ post.content[:500] }}{% if post.content|length > 500 %}...{% endif %}</p>
+                    <figure>
+                        <img src="C:\Users\JXM\Pictures\Screenshots\屏幕截图 2026-07-19 225424.png" alt="示例">
+                    </figure>
+                    <a href="/post/{{ post.id }}">点击此处阅读全文</a>
+                </article>
+            {% endfor %}
+    {% else %}
+            <!-- 没有文章时显示这个 -->
+            <div class="lianjie">
+            <p>还没有文章，<a href="/new" >写第一篇</a></p>
+            </div>
+    {% endif %}
+    </div>
+    <div class="form-b">
+            <a href="javascript:history.back()">← 返回</a>
+    </div>
+</div>
+
+{% endblock %}

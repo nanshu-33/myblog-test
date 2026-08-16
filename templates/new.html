@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}上传{% endblock %}
+
+{% block content %}
+<div class="new-post-form">
+    <h2>上传</h2>
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+        <!-- method="POST" 表示提交时用 POST 请求 -->
+        <form method="POST" action="/new">  <!--创建一个表单，用户填完点提交后，用 POST 方式把数据发送给 /new 这个网址。
+            form是创建表单的命令-->
+            <div class="push">
+                <div class="form-group">
+                    <label for="title">标题</label>  <!--label是HTML 固定标签，是告诉用户需要输入什么的标签-->
+                    <input type="text" id="title" name="title" placeholder="请输入文章标题" required>
+                    <!--<input>	单行文本输入框标签	HTML 固定标签，创建输入控件，不要结束标签
+                    type表示输入信息的类型，还可以改为password、email
+                    id="title"这一行主要是和label对应，与for后面的内容要相同，防止输入框较多的情况下混乱-->
+                    <!--name="title"是该输入内容存储后的名称
+                    placeholder是输入框为空时显示的灰色提示文字
+                    required 限制此空必填，也可以在后面继续加限制条件，不写就是可选择的填空内容
+                    eg:required minlength="2" maxlength="20"必填，2-20个字符
+                    required placeholder="example@email.com"必填，自动验证格式 
+                    required min="1" max="150"必填，1-150之间的数字
+                    required pattern="\d{11}" placeholder="请输入11位手机号"必填，正则验证11位数字-->
+                </div>
+                <div class="form-group">
+                    <label for="category">分类</label>
+                    <select id="category" name="category" style="color: #838181;" onchange="this.style.color='#333'">
+                        <option value="" disabled selected style="color: #838181";>— 请选择分类 —</option>
+                        <option value="新闻热点">新闻热点</option>
+                        <option value="杂谈">杂谈</option>
+                        <option value="学习笔记">学习笔记</option>
+                        <option value="未分类">未分类</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="content">内容</label>
+                    <textarea id="content" name="content" rows="10" placeholder="请输入文章内容" required></textarea>
+                    <!--多行文本输入框，id同样和label配对，name同意是存储名称，row是显示出来的行数，对输入内容的行数本身没有限制，
+                    同时还有cols表示显示的列宽，其他用法与input相同-->
+                </div>
+            
+                <!--value是存入数据库的分类的值-->
+                <!--这里补充一下各种输入框的用法：
+                <input type="text">	单行文本输入框	标题、姓名、搜索词
+                <input type="number">	数字输入框（带加减按钮）	年龄、数量、价格
+                <input type="email">	邮箱输入框（会校验格式）	邮箱地址
+                <input type="password">	密码输入框（输入显示为 ••••）	密码
+                <input type="tel">	电话号码输入框（移动端会弹出数字键盘）	手机号
+                <input type="url">	网址输入框（会校验格式）	网站链接
+                <input type="date">	日期选择器	生日、截止日期
+                <input type="datetime-local">	日期 + 时间选择器	会议时间、活动时间
+                <input type="file">	文件上传按钮	上传图片、附件
+                <input type="checkbox">	复选框	同意条款、多选
+                <input type="radio">	单选框（一组只能选一个）	性别、支付方式
+                <input type="hidden">	隐藏字段（用户看不见）	传递 id、token
+                <input type="color">	颜色选择器	选择颜色
+                <input type="range">	滑块	音量、评分
+                <textarea>	多行文本输入框	文章内容、评论
+                <select> + <option>	下拉菜单	分类选择、城市选择
+                <datalist> + <option>	带建议的输入框（可输入也可选）	搜索建议
+                <button type="submit">	提交按钮	提交表单
+                <button type="reset">	重置按钮	清空表单-->
+            </div>
+            <div class="form-actions">
+                <a href="/" class="btn btn-back">← 返回首页</a>
+                <button type="submit" class="btn btn-submit">发表文章</button> 
+                <!--这里的按钮标签只能在form表单中使用
+                type类型如下：
+                submit	提交按钮
+                reset	重置按钮
+                button	普通按钮：默认无操作-->
+            </div>
+        </form>
+        
+       
+</div>
+{% endblock %}

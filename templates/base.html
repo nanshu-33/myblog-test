@@ -1,0 +1,44 @@
+<!--基础模版框架，定义好了页头和页脚，中间部分替换就行-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}我的博客{% endblock %}</title>  
+    <!--这里花括号的内容是:定义一个名叫 title 的“占位区”，默认显示“我的博客”，但子模板可以随时替换掉它。
+    名字自己起，使用子模板的时候保持相同即可-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='basic111.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>我的博客</h1>
+        <nav>
+            {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+                <a href="/admin">管理</a>
+            {% endif %}
+            <a href="/">首页</a>
+            <a href="/article">文章</a>
+            <a href="/new">上传</a> 
+            <a href="/logout">退登</a> 
+            {% else %}
+            <a href="/login">登录</a>
+            <a href="/register">注册</a>
+            {% endif %}
+            <a href="/message">留言板</a>
+            <a href="/about">关于</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- 子模板填充这里 -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2026 我的博客</p>
+    </footer>
+</body>
+</html>

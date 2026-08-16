@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}留言板{% endblock %}
+{% block content %}
+
+
+    <div class="posts-wrapper">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <script>
+                    window.onload = function() 
+                        {
+                            {% for category, message in messages %}
+                                alert("{{ message }}");
+                            {% endfor %}
+                        };
+                </script>
+            {% endif %}
+        {% endwith %}
+    <article>
+        {% for comment in comments %}  
+            {% if comment.parent_id == 0 %}
+                <div class="comment-item" id="comment-{{ comment.id }}">
+                    <div class="comment-header">
+                        <strong>{{ comment.username }}</strong>
+                    {% if comment.is_admin == 1 %}
+                        <span class="admin-badge">管理员</span>
+                    {% endif %}
+                    <p>发布时间：{{ comment.created_at }}</p>
+                    
+                    </div>
+
+                    <div class="comment-body">
+                        {{ comment.content }}
+                    </div>
+
+                    <div class="comment_foot">
+                    <button class="reply-btn" onclick="showReplyForm({{ comment.id }})">回复</button>
+                    {% if current_user.is_admin or current_user.id == comment.user_id %}
+                    <form method="POST" action="/delete_comment/{{comment.id}}" style="display:inline;">
+                        <button  class="reply-btn" type="submit" onclick="return confirm('确定要删除这条评论吗？');">删除</button>
+                    </form>
+                    {% endif %}
+                    </div>
+
+                    <div class="reply_type">
+                    <form method="POST" action="/new_comment" id="reply-form-{{ comment.id }}" style="display:none;">
+                        <input class="reply" type="text"  name="content" placeholder="回复 {{ comment.username }}..."></textarea>
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <!--评论的parent_id会记录成这个置顶评论的comment.id，然后他就不是0了，就能实现回复的样式-->
+                        <button  type="submit">发布</button>
+                    </form>
+                    </div>
+
+                    {% for reply in comments %}
+                        {% if reply.parent_id == comment.id %}
+                            <div class="reply-item" >
+                                <div class="comment-header">
+                                    <strong>{{ reply.username }}</strong>
+                                    {% if reply.is_admin == 1 %}
+                                        <span class="admin-badge">管理员</span>
+                                    {% endif %}
+                                    <p>发布时间：{{ reply.created_at }}</p>
+                                </div>
+                                <div class="comment-body">
+                                {{ reply.content }}
+                                </div>
+
+                                <div class="comment_foot">
+                                
+                                {% if current_user.is_admin or current_user.id == reply.user_id %}
+                                    <form method="POST" action="/delete_comment/{{reply.id}}" style="display:inline;">
+                                        <button  class="reply-btn" type="submit" onclick="return confirm('确定要删除这条评论吗？');">删除</button>
+                                    </form>
+                                {% endif %}
+                                </div>
+
+
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </article>
+
+            <div class="comment-fixed">
+                <form method="POST" action="/new_comment">
+                    <input type="text" name="content" placeholder="输入留言内容..." required>
+                    <input type="hidden" name="parent_id" value="0">
+                    <button type="submit">发布</button>
+                </form>
+            </div>
+    
+    <script>
+        function showReplyForm(commentId) {
+            console.log('点击回复，commentId =', commentId);  // 调试：看 ID 有没有传对
+            var form = document.getElementById('reply-form-' + commentId);
+            console.log('找到的表单：', form);                // 调试：看表单有没有找到
+            if (form) {
+                if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+            form.style.display = 'none';
+            }
+            } else {
+                alert('找不到 reply-form-' + commentId);
+             }
+            }
+    </script>
+<!--定义了一个函数，名字可以自己改-->
+<!--var表示创建一个变量，叫form，在页面里找 id 等于 reply-form-（输入id） 的表单，找到后存到 form 变量里-->
+<!--document.getElementById 是 JavaScript 内置函数-->
+    
+{% endblock %}

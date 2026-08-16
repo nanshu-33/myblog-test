@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 我的博客{% endblock %}
+
+{% block content %}
+    <div class="posts-wrapper">
+        {% if posts %}    <!--如果有posts就执行下面的循环任务，这里的posts是在主网页的render_template规定的-->
+            {% for post in posts %}  
+                <article>
+                    <h2>{{ post.title }}</h2>
+                    <p>发布时间：{{ post.created_at }}</p>
+                    <p>文章类别：{{post.category}}</p>
+                    {% if current_user.is_admin %}
+                    <p>作者：{{post.author}}</p>
+                    {%endif%}
+                    <p class="article-summary">文章简介：{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                    <figure>
+                        <img src="C:\Users\JXM\Pictures\Screenshots\屏幕截图 2026-07-19 225424.png" alt="示例">
+                    </figure>
+                    <a href="/post/{{ post.id }}">点击此处阅读全文</a>
+                </article>
+            {% endfor %}
+        {% else %}
+            <!-- 没有文章时显示这个 -->
+            <div class="lianjie">
+            <p>还没有文章，<a href="/new" >写第一篇</a></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 侧边栏放在外面，不管有没有文章都显示 -->
+    <aside>
+        <h2>欢迎, {{current_user.username}} ~</h2>
+        <p>这个博客可以以文章的形式存储个人的学习工作笔记。</p>
+        
+        <h3>文章分类</h3>
+        <ul>
+            <li><a href="/category/新闻热点">新闻热点</a></li>
+            <li><a href="/category/杂谈">杂谈</a></li>
+            <li><a href="/category/学习笔记">学习笔记</a></li>
+            <li><a href="/category/未分类">未分类</a></li>
+        </ul>
+        {% if current_user.is_admin %}
+        <h3>作者分类</h3>
+            <ul>
+            {% for author in authors %}  
+                <li><a href="/author/{{ author }}">{{author}}</a></li>
+            {%endfor%}
+            </ul>
+        {%endif%}
+    </aside>
+{% endblock %}

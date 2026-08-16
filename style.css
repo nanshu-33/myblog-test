@@ -1,0 +1,67 @@
+/*通配符选择器*/
+*{
+    margin: 0;   /*清除外边距*/
+    padding: 0;  /*清除内边距*/
+    box-sizing: border-box;   /*不让布局超出范围*/
+}
+/*box全局样式*/
+.box{
+    display: flex;   /*弹性布局*/
+    flex-direction: column;   /*竖直排列*/
+    justify-content:space-evenly;   /*竖直位置起点对齐*/
+    align-items:  center;    /*水平位置居中*/
+    flex-wrap: wrap;   /*超出范围换行*/
+
+    /* 内容尺寸 */
+    width: 1230px;  /*这里可以写max-width: 1000px 这个可以自适应;*/
+    height: 600px;
+
+    /* 内边距：内容到边框的距离 */
+    padding-top: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+     /* 简写：padding: 10px 20px;（上下 左右） */
+    
+    /* 边框 */
+    border: 2px solid black;
+    /* 简写：border: 粗细(可以写数字，也可以thin（细）、medium（中等）、thick（粗）) 
+    样式（solid实线  dashed虚线  dotted点状线  double双实线） 颜色
+    也可以分上下左右分别设置border-top  也可以把各个属性分开写border-top-width*/
+
+    border-radius: 8px;
+    /* 边框圆角  两个值：左上/右下  右上/左下   三个值：左上  右上/左下  右下
+    四个值：左上  右上  右下  左下（顺时针）   border-top-left-radius左上角
+    正圆（宽高相同，不相同就是椭圆）border-radius: 50%;*/
+
+    /* 外边距：盒子到其他盒子的距离 */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;   /*margin-left: auto;   左边所有剩余空间占满，
+    元素会被推到最右侧*/
+    margin-right: 20px;
+    /* 简写：margin: 10px 20px; */
+}
+/*标签选择器*/
+p{
+    color: blueviolet;
+    font-size: 20px;
+}
+h1{
+    color: aquamarine;
+    font-size: 15px;
+}
+div{
+    background: rgb(231, 244, 218);
+}      /*所有div背景变灰,div表示这部分内容类型相同*/
+/*类选择器*/
+.type_1{
+    color: blue;
+    font-size: 20px;
+    background-color:yellow ;
+}
+/*ID选择器*/
+#type_2{
+    color: red;
+    font-size: 24px;
+}
