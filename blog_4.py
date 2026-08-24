@@ -10,7 +10,9 @@ from werkzeug.security import generate_password_hash,check_password_hash
 #generate_password_hash   是处理密码的一个工具，在用户系统中一般都要使用
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dev-secret-key-please-change-this-in-production'
+#app.config['SECRET_KEY'] = 'dev-secret-key-please-change-this-in-production'
+# 改用 MySQL
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blog_user:WSZDwsy1nxcl@@localhost/blog_db'
 
 #数据库相关概念：SQL数据库本质是一个有很多表格的文件，我们创建一个表格比如posts后，数据内容会存进表格当中，每一行在我们的博客中其实就是一篇文章，每一列是每个文章的属性，比如标题，内容等等。
 #主键就是识别每一行数据的一个标志，通常是id，也可以是其他内容，id是自增的，比较方便
