@@ -10,9 +10,11 @@ from werkzeug.security import generate_password_hash,check_password_hash
 #generate_password_hash   是处理密码的一个工具，在用户系统中一般都要使用
 
 app = Flask(__name__)
-#app.config['SECRET_KEY'] = 'dev-secret-key-please-change-this-in-production'
+
 # 改用 MySQL
+app.config['SECRET_KEY'] = 'dev-secret-key-please-change-this-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blog_user:WSZDwsy1nxcl@@localhost/blog_db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 #数据库相关概念：SQL数据库本质是一个有很多表格的文件，我们创建一个表格比如posts后，数据内容会存进表格当中，每一行在我们的博客中其实就是一篇文章，每一列是每个文章的属性，比如标题，内容等等。
 #主键就是识别每一行数据的一个标志，通常是id，也可以是其他内容，id是自增的，比较方便
@@ -27,19 +29,9 @@ login_manager.login_view = 'login'  # 未登录时跳转到登录页
 def load_user(user_id):  #意思是用id找信息，每次跳转页面都查一下用户
     return User.query.get(int(user_id))
 
-def get_db():
-    """获取数据库连接"""
-    conn = sqlite3.connect('blog.db')
-    conn.row_factory = sqlite3.Row  # 让查询结果可以用列名访问
-    #给conn这个一级操作里的row_factory这个命令赋予了列名读取的功能，sqlite3.Row 是用列名访问的工具，只要 conn 的 row_factory 被使用了，就去使用这个工具。
-    return conn  #这里conn是局部变量，我们要把局部变量的修改结果传递出去
-#第一个函数规定好了conn里的标准访问操作，后续操作数据库的时候都要先调用第一个函数把操作规范，然后再进行后面的内容
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(BASE_DIR, 'blog.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# 创建 ORM 实例
 db = SQLAlchemy(app)
 
 class Post(db.Model,UserMixin):
@@ -74,28 +66,22 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
 
-
-
 def get_all_comments():
     comment=Comment.query.order_by(Comment.created_at.desc()).all()
     return comment
 
 
 def get_category_posts(post_category):
-    conn = get_db()
+    
     if current_user.is_admin:
         
-        posts = conn.execute(
-            'SELECT id, title, content, created_at, author, category FROM posts WHERE category = ? ORDER BY created_at DESC',
-            (post_category,)
-        ).fetchall()
+        posts = Post.query.filter(Post.category == post_category).order_by(Post.created_at.desc()).all()
     else:
         
-        posts = conn.execute(
-            'SELECT id, title, content, created_at, author, category FROM posts WHERE category = ? AND user_id = ? ORDER BY created_at DESC',
-            (post_category, current_user.id)
-        ).fetchall()
-    conn.close()
+        posts = Post.query.filter(
+        Post.category == post_category,
+        Post.user_id == current_user.id
+    ).order_by(Post.created_at.desc()).all()
     return posts
 
 def get_category_user(author_name):
@@ -104,55 +90,40 @@ def get_category_user(author_name):
 
 def get_all_posts():
     """获取所有文章，按时间倒序"""
-    if not current_user or not current_user.is_authenticated:
-        return []
-    conn = get_db()  #打开数据库连接
+    
     if current_user.is_admin:
        
-        posts = conn.execute(
-            'SELECT id, title, content, summary, created_at, author, category FROM posts ORDER BY created_at DESC'
-        ).fetchall()
+        posts = Post.query.order_by(Post.created_at.desc()).all()
     else:
-        posts = conn.execute(
-        'SELECT id, title, content, summary, created_at, author,category FROM posts WHERE user_id = ? ORDER BY created_at DESC',  (current_user.id,) 
-        #select是查询的意思，后续是要查询的列名， FEOM是告诉你从posts这张表里查询，
-        # ORDER BY created_at DESC意思是取出的内容按照created_at内容倒叙排列，ASC是正序排列的意思
-        ).fetchall() #查询到的所有结果一次性取出来。.fetchone()	只取第一条结果   .fetchmany(5)	只取前 5 条结果
-    #取出来的结果会存储到posts这个变量中，posts本身是列表，每条数据（上述所有同文章的所有标签中的内容）是字典
-    #这里可以使用ORM语句，效果相同：
-    #posts = Post.query.order_by(Post.created_at.desc()).all()
-    conn.close()  #关闭数据库连接
+        posts = Post.query.filter(
+        Post.user_id == current_user.id
+    ).order_by(Post.created_at.desc()).all() 
+    
     return posts
 
 def get_post_by_id(post_id):
     """根据 ID 获取单篇文章"""
-    conn = get_db()
+   
     if current_user.is_admin:
       
-        post = conn.execute(
-            'SELECT id, title, content, created_at, author, category FROM posts WHERE id = ?',
-            (post_id,)
-        ).fetchone()
+        post = Post.query.filter(Post.id == post_id).order_by(Post.created_at.desc()).first()
     else:
-        post = conn.execute(
-            'SELECT id, title, content, created_at, author, category FROM posts WHERE id = ? AND user_id = ?',
-            (post_id, current_user.id)
-        ).fetchone() #输出查到的第一条数据，用post这个变量储存
-    conn.close()
+        post = Post.query.filter(Post.id == post_id,Post.user_id == current_user.id).order_by(Post.created_at.desc()).first()
     return post
 
 def create_post(title, content, summary, category,author,user_id):
     """创建新文章"""
-    conn = get_db()
-    conn.execute(
-        'INSERT INTO posts (title, content, summary, category,author,user_id) VALUES (?, ?, ?, ?,?,?)',
-        (title, content, summary, category,author,user_id)
-        #INSERT INTO posts	往 posts 表里插入数据
-        #(title, content, summary)	指定要插入的列（字段）
-        #VALUES (?, ?, ?)	这三个 ? 是占位符，分别对应 title、content、summary
+    summary = content[:100] + '...' if len(content) > 100 else content
+    post = Post(
+        title = title,
+        content = content,
+        summary = summary,
+        category = category,
+        user_id = user_id,
+        author = author
     )
-    conn.commit()#保存存入的数据
-    conn.close()
+    db.session.add(post)
+    db.session.commit()
 
 def create_comment( content, user_id,username,is_admin,parent_id):
         comment = Comment(  # ← ORM 方式
@@ -166,7 +137,6 @@ def create_comment( content, user_id,username,is_admin,parent_id):
         db.session.commit()
 
 # ========== 路由 ==========
-
 
 @app.route('/')
 @login_required
@@ -255,15 +225,13 @@ def view_post(post_id):
 @app.route('/post/<int:post_id>/delete', methods=['POST'])
 @login_required
 def delete_post(post_id):
-    conn = get_db()
     if current_user.is_admin:
         # 管理员：删任何文章
-        conn.execute('DELETE FROM posts WHERE id = ?', (post_id,))
+        post = Post.query.get(post_id)
     else:
-        # 普通用户：只能删自己的
-        conn.execute('DELETE FROM posts WHERE id = ? AND user_id = ?', (post_id, current_user.id))
-    conn.commit()
-    conn.close()
+        post = Post.query.filter(Post.id == post_id,Post.user_id == current_user.id).first()
+    db.session.delete(post)
+    db.session.commit()
     return redirect(url_for('index'))
 
 @app.route('/delete_comment/<int:comment_id>', methods=['POST'])
@@ -300,19 +268,20 @@ def update_post(post_id):
     if not title or not content or not category:
         return render_template('edit.html',error='标题,内容和分类都不能为空！')
     
-    conn = get_db()
+     # 先查出这篇文章
     if current_user.is_admin:
-        conn.execute(
-            'UPDATE posts SET title = ?, content = ?, category = ?, author = ? WHERE id = ?',
-            (title, content, category, current_user.username, post_id)
-        )
+        post = Post.query.get(post_id)
     else:
-        conn.execute(
-            'UPDATE posts SET title = ?, content = ?, category = ?, author = ? WHERE id = ? AND user_id = ?',
-            (title, content, category, current_user.username, post_id, current_user.id)
-        )
-    conn.commit()
-    conn.close()
+        post = Post.query.filter(
+            Post.id == post_id,
+            Post.user_id == current_user.id
+        ).first()
+    if post:
+        post.title = title
+        post.content = content
+        post.category = category
+        db.session.commit()
+    
     return redirect(url_for('view_post', post_id=post_id))
 
 @app.route('/register',methods=['POST','GET'])  #注册页面
@@ -358,12 +327,10 @@ def login():
 @app.route('/admin')
 @login_required
 def admin():
-    conn = get_db()
     if not current_user.is_admin:
         return render_template('login.html', error='你没有权限访问此页面')
     user_count = User.query.count()
-    post_count = conn.execute('SELECT COUNT(*) FROM posts').fetchone()[0]   #这里是查询第一列的总数，id列比较不容易出错
-    
+    post_count = Post.query.count()   
     users = User.query.order_by(User.id).all()
     for user in users:
         user.post_count = Post.query.filter_by(user_id=user.id).count()
@@ -439,12 +406,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-with app.app_context():
-    db.create_all()
-    print("✅ 数据库表已创建或已存在")
-
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
