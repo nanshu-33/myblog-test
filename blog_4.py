@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 # 改用 MySQL
 app.config['SECRET_KEY'] = 'dev-secret-key-please-change-this-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blog_user:WSZDwsy1nxcl@@localhost/blog_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blog_user:WSZDwsy1nxcl%40@localhost/blog_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 #数据库相关概念：SQL数据库本质是一个有很多表格的文件，我们创建一个表格比如posts后，数据内容会存进表格当中，每一行在我们的博客中其实就是一篇文章，每一列是每个文章的属性，比如标题，内容等等。
