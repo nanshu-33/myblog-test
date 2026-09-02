@@ -34,6 +34,17 @@ def load_user(user_id):  #意思是用id找信息，每次跳转页面都查一�
 # 创建 ORM 实例
 db = SQLAlchemy(app)
 
+
+post_tags = db.Table('post_tags',
+                     db.Column('post_id',db.Integer,db.ForeignKey('posts.id'),primary_key=True),
+                     db.Column('tag_id',db.Integer,db.ForeignKey('tags.id'),primary_key=True)
+                     )
+
+class Tag(db.Model):
+    __tablename__ = 'tags'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+
 class Post(db.Model,UserMixin):
     __tablename__ = 'posts'
     
@@ -45,6 +56,7 @@ class Post(db.Model,UserMixin):
     summary = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.Column(db.String(80))
+    tags = db.relationship('Tag',secondary=post_tags,backref=db.backref('posts',lazy='dynamic'))
 
 class User(db.Model,UserMixin):     
 #UserMixin是方便处理数据的一些操作,专门给用户数据的
@@ -65,6 +77,7 @@ class Comment(db.Model):
     parent_id = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
+
 
 def get_all_comments():
     comment=Comment.query.order_by(Comment.created_at.desc()).all()
@@ -111,7 +124,7 @@ def get_post_by_id(post_id):
         post = Post.query.filter(Post.id == post_id,Post.user_id == current_user.id).order_by(Post.created_at.desc()).first()
     return post
 
-def create_post(title, content, summary, category,author,user_id):
+def create_post(title, content, summary, category,author,user_id, tag_string=''):
     """创建新文章"""
     summary = content[:100] + '...' if len(content) > 100 else content
     post = Post(
@@ -123,7 +136,25 @@ def create_post(title, content, summary, category,author,user_id):
         author = author
     )
     db.session.add(post)
+    db.session.flush()  # ← 让 post.id 先拿到，但不提交
+    if tag_string:
+        tag_names = tag_string.split(',')
+        for name in tag_names:
+            name = name.strip()
+            if name:
+                tag = create_tag(name)
+                post.tags.append(tag)  #添加一个标签（在中间表插入一条关系）
     db.session.commit()
+    return post
+
+def create_tag(name):
+    tag = Tag.query.filter_by(name=name).first()
+    if not tag:
+        tag = Tag(
+        name = name
+        )
+        db.session.add(tag)
+    return tag
 
 def create_comment( content, user_id,username,is_admin,parent_id):
         comment = Comment(  # ← ORM 方式
@@ -197,6 +228,7 @@ def new_post():
         title = request.form.get('title')
         content = request.form.get('content')
         category = request.form.get('category', '未分类')  # ← 新增：从下拉框获取分类
+        tags = request.form.get('tags','')   #从表单里取 tags 字段的值，如果没有这个字段，返回 ''（空字符串）
         if not title or not content or not category:
             return render_template('new.html',error='标题,内容和分类都不能为空！')
         
@@ -206,8 +238,8 @@ def new_post():
             summary += '...'
         
         # 存入数据库
-        create_post(title, content, summary,category,current_user.username ,current_user.id)  #调用了存入文章数据的函数
-        
+        create_post(title, content, summary,category,current_user.username ,current_user.id,tags)  #调用了存入文章数据的函数
+
         return redirect(url_for('index'))
     
     return render_template('new.html')
@@ -263,6 +295,7 @@ def update_post(post_id):
     title = request.form.get('title')
     content = request.form.get('content')
     category = request.form.get('category', '未分类')  # ← 新增
+    tags = request.form.get('tags','') 
 
     
     if not title or not content or not category:
@@ -276,11 +309,22 @@ def update_post(post_id):
             Post.id == post_id,
             Post.user_id == current_user.id
         ).first()
+
     if post:
         post.title = title
         post.content = content
         post.category = category
-        db.session.commit()
+
+        post.tags.clear()      
+        if tags:
+            tag_names = tags.split(',')
+            for name in tag_names:
+                name = name.strip()
+                if name:
+                    tag = create_tag(name)
+                    post.tags.append(tag)
+
+    db.session.commit()
     
     return redirect(url_for('view_post', post_id=post_id))
 
