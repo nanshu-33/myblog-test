@@ -25,6 +25,10 @@
                 </select>
         </div>
         <div class="form-group">
+            <label for="tags">标签</label>
+            <input type="text" id="tags" name="tags" value="{{ post.tags|map(attribute='name')|join(', ') }}" placeholder="请输入文章标签，多个标签使用英文逗号分隔，非必填">
+        </div>
+        <div class="form-group">
             <label for="content">内容</label>
             <textarea id="content" name="content" rows="10" required>{{ post.content }}</textarea>
         </div>
