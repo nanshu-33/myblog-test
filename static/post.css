@@ -152,3 +152,14 @@ footer{
     padding-top: 20px;
     margin-top: 10px;
 }
+.post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 15px;
+    align-items: center;
+    padding: 8px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #4a5568;
+    font-size: 14px;
+}
