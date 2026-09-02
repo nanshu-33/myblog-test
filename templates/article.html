@@ -12,6 +12,11 @@
                     {% if current_user.is_admin %}
                     <p>作者：{{post.author}}</p>
                     {% endif %}
+                    {% if post.tags %}
+                        {% for tag in post.tags %}
+                            <span>{{tag.name}}</span>
+                        {% endfor %}
+                    {% endif %}
                     <p class="article-summary">文章简介：{{ post.content[:500] }}{% if post.content|length > 500 %}...{% endif %}</p>
                     <figure>
                         <img src="C:\Users\JXM\Pictures\Screenshots\屏幕截图 2026-07-19 225424.png" alt="示例">
