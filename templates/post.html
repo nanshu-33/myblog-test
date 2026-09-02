@@ -13,12 +13,13 @@
                     <span class="category-tag">{{ post.category }}</span>
                     <span>{{ post.created_at }}</span>
                     <span>{{post.author}}</span>
-                </div>
-                {% if post.tags %}
+                    {% if post.tags %}
                         {% for tag in post.tags %}
                             <span>{{tag.name}}</span>
                         {% endfor %}
-                {% endif %}
+                    {% endif %}
+                </div>
+               
                 <div class="content">
                 <p>{{ post.content }}</p>
                 </div>
